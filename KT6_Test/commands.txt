@@ -1,0 +1,3 @@
+pytest main.py --alluredir <название папки с отчетом>
+
+allure serve <название папки с отчетом>
