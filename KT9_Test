@@ -1,0 +1,51 @@
+import pytest
+import httpx
+import asyncio
+from app import app  
+
+@pytest.fixture
+async def client():
+    async with httpx.AsyncClient(app=app, base_url="http://testserver") as client:
+        yield client
+
+@pytest.mark.asyncio
+async def test_registration(client):
+    user_data = {
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    }
+    response = await client.post("/register", json=user_data)
+    assert response.status_code == 200
+    assert response.json()["message"] == "User registered successfully"
+
+@pytest.mark.asyncio
+async def test_login(client):
+    login_data = {
+        "username": "testuser",
+        "password": "password123"
+    }
+    response = await client.post("/login", data=login_data)
+    assert response.status_code == 200
+    assert "access_token" in response.json()
+
+@pytest.mark.asyncio
+async def test_view_profile(client):
+    response = await client.get("/profile")
+    assert response.status_code == 200
+    assert "username" in response.json()
+
+@pytest.mark.asyncio
+async def test_edit_profile(client):
+    updated_profile_data = {
+        "email": "newemail@example.com"
+    }
+    response = await client.put("/profile", json=updated_profile_data)
+    assert response.status_code == 200
+    assert response.json()["message"] == "Profile updated successfully"
+
+
+Итог :
+Рекомендации:
+1. Рассмотрите возможность добавления тестов на обработку ошибок, чтобы убедиться, что веб-приложение корректно обрабатывает случаи, когда данные в запросах некорректны или отсутствуют.
+2. Организуйте более обширное тестирование для всех возможных сценариев использования, чтобы убедиться в надежности и безопасности вашего веб-приложения.
